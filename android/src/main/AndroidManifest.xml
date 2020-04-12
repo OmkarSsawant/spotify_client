@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.visiondev.spotifyclient">
+<application>
+        <activity
+            android:name="com.spotify.sdk.android.Authorization.LoginActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+</application>
+</manifest>

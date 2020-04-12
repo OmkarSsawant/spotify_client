@@ -1,0 +1,55 @@
+group 'com.visiondev.spotifyclient'
+version '1.0'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        flatDir {
+            dirs 'libs'
+        }
+
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.0'
+
+
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        flatDir {
+            dirs 'libs'
+        }
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 16
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+
+}
+
+dependencies {
+//    implementation 'com.spotify.android:auth:1.2.3'
+    // spotify
+    implementation project(':spotify-auth')
+    implementation project(':spotify-app-remote')
+    implementation "com.google.code.gson:gson:2.8.5"// Maven dependency
+    implementation 'androidx.browser:browser:1.0.0'
+}
