@@ -3,8 +3,10 @@ package com.visiondev.spotifyclient;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 
@@ -22,11 +24,17 @@ import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugin.common.PluginRegistry;
+
+import static com.spotify.sdk.android.auth.AuthorizationResponse.Type.ERROR;
+import static com.spotify.sdk.android.auth.AuthorizationResponse.Type.TOKEN;
 
 
-
-class Spotifire  {
+class Spotifire implements  PluginRegistry.ActivityResultListener {
 
     private Activity activity;
     private Context context;
@@ -35,21 +43,24 @@ class Spotifire  {
 
     private SpotifyAppRemote mspotifyAppRemote;
 
-     static final String LOGSTATE_KEY = "isLoggedIn";
-    private static final String CLIENTID_KEY = "clientId";
-
-    private SharedPreferences sharedPreferences ;
 
     String test = "sink not init";
 
     Spotifire(Context _context) {
         this.context = _context;
-        sharedPreferences =context.getSharedPreferences(null,Context.MODE_PRIVATE);
 
     }
 
     private static final String REDIRECT_URI = "spotify-sdk://auth";
     private static final int REQUEST_CODE = 1337;
+
+
+    private Map<String, String> mResponce = new HashMap<>();
+
+
+    public Map<String, String> getmResponce() {
+        return mResponce;
+    }
 
     private static MethodChannel.Result mRemoteresult;
 
@@ -57,6 +68,8 @@ class Spotifire  {
     void setActivity(Activity _activity) {
         this.activity = _activity;
     }
+
+
 
     void login(String _CLIENT_ID) {
         this.CLIENT_ID = _CLIENT_ID;
@@ -115,18 +128,6 @@ class Spotifire  {
 
     }
 
-
-    void save(String val,String key){
-
-        @SuppressLint("CommitPrefEdits") final SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putString(val,key);
-    }
-
-    String getSaved(String key){
-    return   sharedPreferences.getString(key,"default");
-    }
-
     void disconnectRemote() {
         if (isConnected())
             SpotifyAppRemote.disconnect(mspotifyAppRemote);
@@ -157,9 +158,9 @@ class Spotifire  {
                         public void onEvent(PlayerState playerState) {
                             final Track track = playerState.track;
                             if (track != null) {
-                                Log.d("MainActivity", track.name + " by " + track.artist.name);
-                                Log.d("PlayerStateURI", track.uri);
-                                Log.d("PlayerStateImgUri", track.imageUri.raw);
+Log.d("Track name",track.name);
+Log.d("Track uri",track.uri);
+Log.d("Track image uri",track.imageUri.toString());
                             }
                         }
                     });
@@ -197,10 +198,31 @@ class Spotifire  {
 
 
 
-private int testCount=0;
 
-     int getTestCount() {
-        return testCount;
+    @Override
+    public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE) {
+            this.test = "Working Fine";
+
+            AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, data);
+            if (response.getType() == TOKEN) {
+                // Handle successful response
+                String accessToken = response.getAccessToken();
+                mResponce.clear();
+                mResponce.put("accessToken",accessToken);
+
+                return false;
+            } else if (response.getType() == ERROR) {
+                mResponce.clear();
+                mResponce.put("error",response.getError());
+
+                return false;
+            }else{
+                mResponce.clear();
+                mResponce.put("error","Authentication Cancelled");
+
+            }
+        }
+        return false;
     }
-
 }

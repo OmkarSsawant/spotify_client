@@ -21,8 +21,6 @@ public class SpotifyclientPlugin implements FlutterPlugin, ActivityAware {
    private static Spotifire spotifire;
 
 
-
-
     private static   SpotifyCallHandler spotifyCallHandler;
 
   @Override
@@ -75,17 +73,19 @@ private ActivityPluginBinding activityPluginBinding;
   @Override
   public void onDetachedFromActivity() {
      this.toreActivity();
+     spotifire.pause();
+     spotifire.disconnectRemote();
   }
 
 
   private  void attachActivity(ActivityPluginBinding _activitybinding){
       this.activityPluginBinding = _activitybinding;
       spotifire.setActivity(_activitybinding.getActivity());
-   _activitybinding.addActivityResultListener(spotifyCallHandler);
+   _activitybinding.addActivityResultListener(spotifire);
 
   }
   private  void toreActivity(){
-      activityPluginBinding.removeActivityResultListener(spotifyCallHandler);
+      activityPluginBinding.removeActivityResultListener(spotifire);
     spotifire.setActivity(null);
     activityPluginBinding= null;
   }
