@@ -3,6 +3,7 @@ package com.visiondev.spotifyclient;
 
 import android.content.Intent;
 
+import com.spotify.protocol.types.Repeat;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
 
@@ -34,18 +35,18 @@ public class SpotifyCallHandler implements MethodChannel.MethodCallHandler {
 
         switch (call.method) {
             case "loginSpotify":
-                spotifire.login("155e080c3b0d482683a8a088b4a5779e");
+                spotifire.login((String) call.argument("client_id"));
                 result.success(null);
                 break;
             case "getAccessToken":
-                Map<String,String> res = spotifire.getmResponce();
-                 if(res.containsKey("accessToken")){
+                Map<String, String> res = spotifire.getmResponce();
+                if (res.containsKey("accessToken")) {
                     result.success(res.get("accessToken"));
-                 }else if(res.containsKey("error")){
-                      result.error("AuthError",res.get("error"),res);
-                 }else{
-                     result.success(res.toString());
-                 }
+                } else if (res.containsKey("error")) {
+                    result.error("AuthError", res.get("error"), res);
+                } else {
+                    result.success(res.toString());
+                }
                 break;
             case "logoutSpotify":
                 spotifire.logout(result);
@@ -55,9 +56,9 @@ public class SpotifyCallHandler implements MethodChannel.MethodCallHandler {
                 result.success(spotifire.isConnected());
                 break;
             case "connectRemote":
-                if(spotifire.isConnected()){
+                if (spotifire.isConnected()) {
                     result.success(true);
-                }else{
+                } else {
                     spotifire.connectRemote(result);
                 }
                 break;
@@ -66,26 +67,58 @@ public class SpotifyCallHandler implements MethodChannel.MethodCallHandler {
                 result.success(true);
                 break;
             case "playPlaylist":
-                spotifire.startPlaylist(null, result);
+                spotifire.startPlaylist((String) call.argument("playListUri"), result);
+                result.success(null);
                 break;
             case "pauseMusic":
-                spotifire.pause();
-                result.success(true);
+                if(spotifire.isConnected()){
+                    spotifire.pause();
+                    result.success(true);
+                }else{
+                    result.success(false);
+                }
                 break;
             case "resumeMusic":
-                spotifire.resume();
-                result.success(true);
+                if(spotifire.isConnected()){
+                    spotifire.resume();
+                    result.success(true);
+                }else{
+                    result.success(false);
+                }
                 break;
             case "skipNext":
-                spotifire.skipNext();
+                if(spotifire.isConnected()){
+                    spotifire.skipNext();
+                    result.success(true);
+                }else{
+                    result.success(false);
+                }
                 break;
             case "skipPrevious":
-                spotifire.skipPrevious();
+                if(spotifire.isConnected()){
+                    spotifire.skipPrevious();
+                    result.success(true);
+                }else{
+                    result.success(false);
+                }
                 break;
-            case "test":
-                result.success(spotifire.testSP());
+            case "seekTo":
+                if(spotifire.isConnected())
+                spotifire.seekTo((int) call.argument("duration"));
+                result.success(null);
                 break;
+            case "setRepeat":
+                if(spotifire.isConnected())
+                spotifire.setRepeat((int) call.argument("repeat"));
+                result.success(null);
 
+                break;
+            case "queue":
+                if(spotifire.isConnected())
+                spotifire.queue((String) call.argument("nqueue"));
+                result.success(null);
+
+                break;
             default:
                 result.notImplemented();
                 break;

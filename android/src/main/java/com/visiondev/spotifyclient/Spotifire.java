@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -12,19 +13,27 @@ import android.util.Log;
 
 import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.Connector;
+import com.spotify.android.appremote.api.PlayerApi;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.android.appremote.api.error.CouldNotFindSpotifyApp;
 import com.spotify.android.appremote.api.error.NotLoggedInException;
 import com.spotify.android.appremote.api.error.UserNotAuthorizedException;
+import com.spotify.protocol.client.CallResult;
 import com.spotify.protocol.client.Subscription;
+import com.spotify.protocol.types.Empty;
+import com.spotify.protocol.types.ImageUri;
 import com.spotify.protocol.types.PlayerState;
+import com.spotify.protocol.types.Repeat;
 import com.spotify.protocol.types.Track;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
 
 
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
@@ -43,11 +52,12 @@ class Spotifire implements  PluginRegistry.ActivityResultListener {
 
     private SpotifyAppRemote mspotifyAppRemote;
 
+    private SpotifyStreamHandler mSpotifyStreamHandler;
 
-    String test = "sink not init";
 
-    Spotifire(Context _context) {
+    Spotifire(Context _context,SpotifyStreamHandler mStreamHandler) {
         this.context = _context;
+        this.mSpotifyStreamHandler = mStreamHandler;
 
     }
 
@@ -143,6 +153,36 @@ class Spotifire implements  PluginRegistry.ActivityResultListener {
         return false;
     }
 
+    private Bitmap _bitmap;
+
+
+    List<Integer> getFlutterImagebits(Bitmap bitmap){
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
+        ArrayList<Integer> bytesInt = new ArrayList<>();
+        for (Byte b:byteArrayOutputStream.toByteArray()
+        ) {
+            bytesInt.add(b.intValue());
+        }
+        return bytesInt;
+    }
+
+    void seekTo(int pos){
+        mspotifyAppRemote.getPlayerApi().seekTo((long) pos );
+    }
+
+     void setRepeat(int repeat){
+         mspotifyAppRemote.getPlayerApi().setRepeat(repeat);
+    }
+
+    void queue(String nplaylistURI){
+        mspotifyAppRemote.getPlayerApi().queue(nplaylistURI);
+    }
+
+    CallResult<Bitmap> getImage(ImageUri imageuri){
+        return  mspotifyAppRemote.getImagesApi().getImage(imageuri);
+     }
+
     void startPlaylist(String playlistid, MethodChannel.Result result) {
         if (playlistid == null) playlistid = "spotify:playlist:37i9dQZF1DX3rxVfibe1L0";
 
@@ -153,17 +193,7 @@ class Spotifire implements  PluginRegistry.ActivityResultListener {
             // Subscribe to PlayerState
             mspotifyAppRemote.getPlayerApi()
                     .subscribeToPlayerState()
-                    .setEventCallback(new Subscription.EventCallback<PlayerState>() {
-                        @Override
-                        public void onEvent(PlayerState playerState) {
-                            final Track track = playerState.track;
-                            if (track != null) {
-Log.d("Track name",track.name);
-Log.d("Track uri",track.uri);
-Log.d("Track image uri",track.imageUri.toString());
-                            }
-                        }
-                    });
+                    .setEventCallback(mSpotifyStreamHandler);
             result.success(true);
         } else {
             connectRemote(result);
@@ -189,9 +219,7 @@ Log.d("Track image uri",track.imageUri.toString());
     }
 
 
-    String testSP() {
-        return test;
-    }
+
     //TODO: implement repeat
 
 
@@ -202,7 +230,6 @@ Log.d("Track image uri",track.imageUri.toString());
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE) {
-            this.test = "Working Fine";
 
             AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, data);
             if (response.getType() == TOKEN) {

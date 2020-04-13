@@ -26,19 +26,29 @@ public class SpotifyclientPlugin implements FlutterPlugin, ActivityAware {
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
     final MethodChannel channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "spotifyclient");
-      spotifire = new Spotifire(flutterPluginBinding.getApplicationContext());
+      final SpotifyStreamHandler spotifyStreamHandler = new SpotifyStreamHandler();
+   final EventChannel eventChannel = new EventChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(),"musicStream");
+      spotifire = new Spotifire(flutterPluginBinding.getApplicationContext(),spotifyStreamHandler);
 
+
+      spotifyStreamHandler.setSpotifire(spotifire);
+      eventChannel.setStreamHandler(spotifyStreamHandler);
       spotifyCallHandler = new SpotifyCallHandler(spotifire);
       channel.setMethodCallHandler(spotifyCallHandler);
-
 
   }
 
   public static void registerWith(Registrar registrar) {
       final MethodChannel channel = new MethodChannel(registrar.messenger(), "spotifyclient");
+      final EventChannel eventChannel = new EventChannel(registrar.messenger(),"musicStream");
 
+      final SpotifyStreamHandler spotifyStreamHandler = new SpotifyStreamHandler();
 
-      spotifire = new Spotifire(registrar.context());
+      spotifire = new Spotifire(registrar.context(),spotifyStreamHandler);
+
+      spotifyStreamHandler.setSpotifire(spotifire);
+      eventChannel.setStreamHandler(spotifyStreamHandler);
+
       spotifyCallHandler = new SpotifyCallHandler(spotifire);
       channel.setMethodCallHandler(spotifyCallHandler);
 
