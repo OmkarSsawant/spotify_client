@@ -1,6 +1,7 @@
 package com.visiondev.spotifyclient;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
 
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -18,22 +19,21 @@ public class SpotifyclientPlugin implements FlutterPlugin, ActivityAware {
 
 
 
-   private static Spotifire spotifire;
+     private Spotifire spotifire;
 
 
-    private static   SpotifyCallHandler spotifyCallHandler;
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
     final MethodChannel channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "spotifyclient");
-      final SpotifyStreamHandler spotifyStreamHandler = new SpotifyStreamHandler();
-   final EventChannel eventChannel = new EventChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(),"musicStream");
-      spotifire = new Spotifire(flutterPluginBinding.getApplicationContext(),spotifyStreamHandler);
+      final EventChannel eventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(),"musicStream");
+      final SpotifyStreamHandler spotifyStreamHandler = new SpotifyStreamHandler(channel);
 
+ spotifire = new Spotifire(flutterPluginBinding.getApplicationContext(),spotifyStreamHandler);
 
       spotifyStreamHandler.setSpotifire(spotifire);
       eventChannel.setStreamHandler(spotifyStreamHandler);
-      spotifyCallHandler = new SpotifyCallHandler(spotifire);
+    final SpotifyCallHandler spotifyCallHandler = new SpotifyCallHandler(spotifire);
       channel.setMethodCallHandler(spotifyCallHandler);
 
   }
@@ -42,14 +42,16 @@ public class SpotifyclientPlugin implements FlutterPlugin, ActivityAware {
       final MethodChannel channel = new MethodChannel(registrar.messenger(), "spotifyclient");
       final EventChannel eventChannel = new EventChannel(registrar.messenger(),"musicStream");
 
-      final SpotifyStreamHandler spotifyStreamHandler = new SpotifyStreamHandler();
 
-      spotifire = new Spotifire(registrar.context(),spotifyStreamHandler);
+      final SpotifyStreamHandler spotifyStreamHandler = new SpotifyStreamHandler(channel);
 
-      spotifyStreamHandler.setSpotifire(spotifire);
+       final SpotifyclientPlugin plugin = new SpotifyclientPlugin();
+     plugin.spotifire = new Spotifire(registrar.context(),spotifyStreamHandler);
+
+      spotifyStreamHandler.setSpotifire(plugin.spotifire);
       eventChannel.setStreamHandler(spotifyStreamHandler);
 
-      spotifyCallHandler = new SpotifyCallHandler(spotifire);
+   final SpotifyCallHandler   spotifyCallHandler = new SpotifyCallHandler(plugin.spotifire);
       channel.setMethodCallHandler(spotifyCallHandler);
 
   }

@@ -1,23 +1,11 @@
 package com.visiondev.spotifyclient;
 
 
-import android.content.Intent;
-
-import com.spotify.protocol.types.Repeat;
-import com.spotify.sdk.android.auth.AuthorizationClient;
-import com.spotify.sdk.android.auth.AuthorizationResponse;
-
-import java.util.HashMap;
 import java.util.Map;
 
-import io.flutter.Log;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.PluginRegistry;
 
-import static com.spotify.sdk.android.auth.AuthorizationResponse.Type.ERROR;
-import static com.spotify.sdk.android.auth.AuthorizationResponse.Type.TOKEN;
-import static com.spotify.sdk.android.auth.LoginActivity.REQUEST_CODE;
 
 public class SpotifyCallHandler implements MethodChannel.MethodCallHandler {
 

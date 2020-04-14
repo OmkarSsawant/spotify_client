@@ -1,5 +1,7 @@
 
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -21,6 +23,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
+
     initPlatformState();
   }
 
@@ -29,7 +33,7 @@ class _MyAppState extends State<MyApp> {
     String platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      await Spotifyclient.login(clientid: "Your client id");
+      await Spotifyclient.login(clientid:"155e080c3b0d482683a8a088b4a5779e");
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -47,8 +51,12 @@ class _MyAppState extends State<MyApp> {
         _music = music;
       });
     }).onError((error){
-
+ print(error);
     });
+
+   Spotifyclient.positonStream.listen((Duration position){
+     print(position);
+   });
   }
 
   @override
@@ -105,14 +113,14 @@ class _MyAppState extends State<MyApp> {
           //   print("Access Token : " + token);
           // }).catchError(print);
           // // await Spotifyclient.test.then(print);
-
-          await Spotifyclient.isRemoteConnected.then(print);
+print("clicked");
+          // await Spotifyclient.isRemoteConnected.then(print);
           await Spotifyclient.connectRemote.then(print);
           try {
             if (await Spotifyclient.isRemoteConnected)
               await Spotifyclient.playPlaylist(playlistUri: "spotify:playlist:37i9dQZF1DX3rxVfibe1L0");
           }catch(e){
-
+               print(e);
           }
         }),
       ),

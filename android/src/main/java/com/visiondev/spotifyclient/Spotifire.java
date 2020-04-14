@@ -1,30 +1,22 @@
 package com.visiondev.spotifyclient;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 
 import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.Connector;
-import com.spotify.android.appremote.api.PlayerApi;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.android.appremote.api.error.CouldNotFindSpotifyApp;
 import com.spotify.android.appremote.api.error.NotLoggedInException;
 import com.spotify.android.appremote.api.error.UserNotAuthorizedException;
 import com.spotify.protocol.client.CallResult;
-import com.spotify.protocol.client.Subscription;
 import com.spotify.protocol.types.Empty;
 import com.spotify.protocol.types.ImageUri;
-import com.spotify.protocol.types.PlayerState;
-import com.spotify.protocol.types.Repeat;
-import com.spotify.protocol.types.Track;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
@@ -43,7 +35,7 @@ import static com.spotify.sdk.android.auth.AuthorizationResponse.Type.ERROR;
 import static com.spotify.sdk.android.auth.AuthorizationResponse.Type.TOKEN;
 
 
-class Spotifire implements  PluginRegistry.ActivityResultListener {
+class Spotifire implements PluginRegistry.ActivityResultListener {
 
     private Activity activity;
     private Context context;
@@ -55,7 +47,7 @@ class Spotifire implements  PluginRegistry.ActivityResultListener {
     private SpotifyStreamHandler mSpotifyStreamHandler;
 
 
-    Spotifire(Context _context,SpotifyStreamHandler mStreamHandler) {
+    Spotifire(Context _context, SpotifyStreamHandler mStreamHandler) {
         this.context = _context;
         this.mSpotifyStreamHandler = mStreamHandler;
 
@@ -78,7 +70,6 @@ class Spotifire implements  PluginRegistry.ActivityResultListener {
     void setActivity(Activity _activity) {
         this.activity = _activity;
     }
-
 
 
     void login(String _CLIENT_ID) {
@@ -139,8 +130,12 @@ class Spotifire implements  PluginRegistry.ActivityResultListener {
     }
 
     void disconnectRemote() {
-        if (isConnected())
+        if (isConnected()) {
             SpotifyAppRemote.disconnect(mspotifyAppRemote);
+            if (mSpotifyStreamHandler.isrunnablerunning) {
+                mSpotifyStreamHandler.stopPositionRunnable();
+            }
+        }
     }
 
     private Uri getRedirectUri() {
@@ -153,42 +148,47 @@ class Spotifire implements  PluginRegistry.ActivityResultListener {
         return false;
     }
 
-    private Bitmap _bitmap;
 
 
-    List<Integer> getFlutterImagebits(Bitmap bitmap){
+    List<Integer> getFlutterImagebits(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         ArrayList<Integer> bytesInt = new ArrayList<>();
-        for (Byte b:byteArrayOutputStream.toByteArray()
+        for (Byte b : byteArrayOutputStream.toByteArray()
         ) {
             bytesInt.add(b.intValue());
         }
         return bytesInt;
     }
 
-    void seekTo(int pos){
-        mspotifyAppRemote.getPlayerApi().seekTo((long) pos );
+    void seekTo(int pos) {
+
+        mspotifyAppRemote.getPlayerApi().seekTo((long) pos);
     }
 
-     void setRepeat(int repeat){
-         mspotifyAppRemote.getPlayerApi().setRepeat(repeat);
+    void setRepeat(int repeat) {
+        mspotifyAppRemote.getPlayerApi().setRepeat(repeat);
     }
 
-    void queue(String nplaylistURI){
+    void queue(String nplaylistURI) {
         mspotifyAppRemote.getPlayerApi().queue(nplaylistURI);
     }
 
-    CallResult<Bitmap> getImage(ImageUri imageuri){
-        return  mspotifyAppRemote.getImagesApi().getImage(imageuri);
-     }
+    CallResult<Bitmap> getImage(ImageUri imageuri) {
+        return mspotifyAppRemote.getImagesApi().getImage(imageuri);
+    }
 
     void startPlaylist(String playlistid, MethodChannel.Result result) {
         if (playlistid == null) playlistid = "spotify:playlist:37i9dQZF1DX3rxVfibe1L0";
 
         if (isConnected()) {
             // Play a playlist
-            mspotifyAppRemote.getPlayerApi().play(playlistid);
+            mspotifyAppRemote.getPlayerApi().play(playlistid).setResultCallback(new CallResult.ResultCallback<Empty>() {
+                @Override
+                public void onResult(Empty empty) {
+                    mSpotifyStreamHandler.startPositionRunnable();
+                }
+            });
 
             // Subscribe to PlayerState
             mspotifyAppRemote.getPlayerApi()
@@ -219,12 +219,7 @@ class Spotifire implements  PluginRegistry.ActivityResultListener {
     }
 
 
-
     //TODO: implement repeat
-
-
-
-
 
 
     @Override
@@ -236,17 +231,17 @@ class Spotifire implements  PluginRegistry.ActivityResultListener {
                 // Handle successful response
                 String accessToken = response.getAccessToken();
                 mResponce.clear();
-                mResponce.put("accessToken",accessToken);
+                mResponce.put("accessToken", accessToken);
 
                 return false;
             } else if (response.getType() == ERROR) {
                 mResponce.clear();
-                mResponce.put("error",response.getError());
+                mResponce.put("error", response.getError());
 
                 return false;
-            }else{
+            } else {
                 mResponce.clear();
-                mResponce.put("error","Authentication Cancelled");
+                mResponce.put("error", "Authentication Cancelled");
 
             }
         }
