@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 enum Repeat { one, all, off }
 
-class Spotifyclient {
+class Spotifire {
   static const MethodChannel _channel = const MethodChannel('spotifyclient');
   static EventChannel _eventChannel = EventChannel('musicStream');
 
@@ -41,7 +41,7 @@ class Spotifyclient {
   }
 
 
-  static Future<void> login({@required String clientid}) async {
+  static Future<void> init({@required String clientid}) async {
     Map configs= new Map();    
     configs.putIfAbsent("client_id", () => clientid);
     await _channel.invokeMethod('loginSpotify', configs);

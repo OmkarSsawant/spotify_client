@@ -181,6 +181,7 @@ class Spotifire implements PluginRegistry.ActivityResultListener {
     void startPlaylist(String playlistid, MethodChannel.Result result) {
         if (playlistid == null) playlistid = "spotify:playlist:37i9dQZF1DX3rxVfibe1L0";
 
+
         if (isConnected()) {
             // Play a playlist
             mspotifyAppRemote.getPlayerApi().play(playlistid).setResultCallback(new CallResult.ResultCallback<Empty>() {

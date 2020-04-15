@@ -2,7 +2,6 @@ package com.visiondev.spotifyclient;
 
 import android.graphics.Bitmap;
 import android.os.Handler;
-import android.util.Log;
 
 import com.spotify.protocol.client.CallResult;
 import com.spotify.protocol.client.Subscription;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.flutter.Log;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodChannel;
 
@@ -43,30 +43,31 @@ private  Map<String ,Integer> map = new HashMap<>();
     private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
-          if(spotifire.isConnected() && !ispaused)
-          {
-              map.clear();
-              map.put("d",posmilli);
-              methodChannel.invokeMethod("music.position",map);
-              handler.postDelayed(this,1000);
-          }
+         try{
+             if(spotifire.isConnected() && !ispaused)
+             {
+                 map.clear();
+                 map.put("d",posmilli);
+                 methodChannel.invokeMethod("music.position",map);
+                 handler.postDelayed(this,1000);
+             }
+         }catch (Exception e){
+             e.printStackTrace();
+         }
+
         }
 
     };
 
     void startPositionRunnable(){
-
-        runnable.run();
+        handler.post(runnable);
         isrunnablerunning = true;
     }
-
 
     void stopPositionRunnable(){
         handler.removeCallbacks(runnable);
         isrunnablerunning= false;
     }
-
-
 
     void setSpotifire(Spotifire spotifire) {
         this.spotifire = spotifire;
@@ -107,15 +108,18 @@ private  Map<String ,Integer> map = new HashMap<>();
 
     @Override
     public void onEvent(PlayerState playerState) {
+
+        Log.d("onEvent","Event was called");
+
         final Track track = playerState.track;
         posmilli = (int)  playerState.playbackPosition;
         ispaused = playerState.isPaused;
-        Log.d("milliseconds",String.valueOf(posmilli));
+        String ms= String.valueOf(posmilli);
+        Log.d("milliseconds : ",ms);
         if (track != null) {
             spotifire.getImage(track.imageUri).setResultCallback(new CallResult.ResultCallback<Bitmap>() {
                 @Override
                 public void onResult(Bitmap bitmap) {
-               Log.d("Track Map",getMap(track,bitmap).toString());
                     mEventSink.success(getMap(track, bitmap));
                 }
 
