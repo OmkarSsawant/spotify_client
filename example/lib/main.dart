@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:spotifyclient/spotifyclient.dart';
+import 'package:spotify_auth_player/spotify_auth_player.dart';
 
 void main() => runApp(MyApp());
 
