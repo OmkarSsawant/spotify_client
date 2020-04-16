@@ -115,7 +115,14 @@ You can get `playlistUri` from spotify App.
 ```
 
 
-### Position Stream is in development 
+### get current Position by position Stream
+
+
+```dart 
+
+     Spotifire.positonStream.listen((d)=> print(d.inMilliseconds));
+
+```
 
 For help getting started with Flutter, view our 
 [online documentation](https://flutter.dev/docs), which offers tutorials, 

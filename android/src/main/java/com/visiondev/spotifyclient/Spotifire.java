@@ -60,7 +60,7 @@ class Spotifire implements PluginRegistry.ActivityResultListener {
     private Map<String, String> mResponce = new HashMap<>();
 
 
-    public Map<String, String> getmResponce() {
+     Map<String, String> getmResponce() {
         return mResponce;
     }
 

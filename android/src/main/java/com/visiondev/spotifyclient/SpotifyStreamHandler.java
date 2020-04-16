@@ -12,6 +12,8 @@ import com.spotify.protocol.types.Track;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.flutter.Log;
 import io.flutter.plugin.common.EventChannel;
@@ -21,7 +23,7 @@ public class SpotifyStreamHandler implements EventChannel.StreamHandler, Subscri
 
 
 
-    private int posmilli=0;
+    private PlayerState mPlayerState;
 
     private Spotifire spotifire;
 
@@ -31,9 +33,13 @@ private  Map<String ,Integer> map = new HashMap<>();
 
     private  MethodChannel methodChannel;
 
+  private  long prepos=0;
+
+   private int millisecs=0;
    boolean isrunnablerunning=false;
     private boolean ispaused=false;
     private final Handler handler = new Handler();
+
 
     SpotifyStreamHandler(MethodChannel channel){
        this.methodChannel = channel;
@@ -44,13 +50,25 @@ private  Map<String ,Integer> map = new HashMap<>();
         @Override
         public void run() {
          try{
-             if(spotifire.isConnected() && !ispaused)
+
+             if(spotifire.isConnected() && !ispaused && mPlayerState!=null)
              {
-                 map.clear();
-                 map.put("d",posmilli);
-                 methodChannel.invokeMethod("music.position",map);
-                 handler.postDelayed(this,1000);
+                 if(prepos!=mPlayerState.playbackPosition){
+                     //is seeked
+                     map.clear();
+                     millisecs =(int) mPlayerState.playbackPosition;
+                     map.put("d",millisecs);
+                     methodChannel.invokeMethod("music.position",map);
+                 }else{
+                     map.clear();
+                     millisecs+=1000;
+                     map.put("d",millisecs);
+                     methodChannel.invokeMethod("music.position",map);
+                 }
+
              }
+             if(mPlayerState!=null) prepos = mPlayerState.playbackPosition;
+             handler.postDelayed(this,1000);
          }catch (Exception e){
              e.printStackTrace();
          }
@@ -75,13 +93,11 @@ private  Map<String ,Integer> map = new HashMap<>();
 
     @Override
     public void onListen(Object arguments, EventChannel.EventSink events) {
-//        Log.d("Listening",events.toString());
         this.mEventSink = events;
     }
 
     @Override
     public void onCancel(Object arguments) {
-        Log.d("cancelled", "stream");
         this.mEventSink = null;
     }
 
@@ -109,13 +125,10 @@ private  Map<String ,Integer> map = new HashMap<>();
     @Override
     public void onEvent(PlayerState playerState) {
 
-        Log.d("onEvent","Event was called");
 
         final Track track = playerState.track;
-        posmilli = (int)  playerState.playbackPosition;
+        mPlayerState =   playerState;
         ispaused = playerState.isPaused;
-        String ms= String.valueOf(posmilli);
-        Log.d("milliseconds : ",ms);
         if (track != null) {
             spotifire.getImage(track.imageUri).setResultCallback(new CallResult.ResultCallback<Bitmap>() {
                 @Override

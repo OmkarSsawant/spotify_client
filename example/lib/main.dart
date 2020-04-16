@@ -50,9 +50,11 @@ class _MyAppState extends State<MyApp> {
       print(error);
     });
 
-    Spotifire.positonStream.listen((Duration position) {
-      print(position.inMilliseconds);
-    });
+
+   Spotifire.positonStream.listen((d)=> print(d.inMilliseconds));
+    // Spotifire.positonStream.listen((Duration position) {
+    //   print(position.inMilliseconds);
+    // });
   }
 
   @override
@@ -114,8 +116,8 @@ class _MyAppState extends State<MyApp> {
                               });
                             }),
                         crossFadeState: ispaused
-                            ? CrossFadeState.showSecond
-                            : CrossFadeState.showFirst,
+                            ? CrossFadeState.showFirst
+                            : CrossFadeState.showSecond,
                         duration: const Duration(milliseconds: 700)),
                     IconButton(
                         icon: Icon(Icons.skip_next, size: 50),
@@ -131,7 +133,9 @@ class _MyAppState extends State<MyApp> {
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.playlist_play,size: 35,),
           onPressed: () async {
-          await Spotifire.connectRemote.then(print);
+              await Spotifire.getAccessToken.then(print);
+
+          await Spotifire.connectRemote.then(print).whenComplete(()=>print("compl"));
           try {
             if (await Spotifire.isRemoteConnected)
               await Spotifire.playPlaylist(
@@ -146,11 +150,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
-    _closeMusic();
+  Spotifire.close();
+
     super.dispose();
   }
 
-  Future<void> _closeMusic() async {
-    if (await Spotifire.isRemoteConnected) await Spotifire.disconnectRemote;
-  }
+  
 }

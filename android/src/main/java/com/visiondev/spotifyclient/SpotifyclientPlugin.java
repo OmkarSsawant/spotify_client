@@ -21,12 +21,16 @@ public class SpotifyclientPlugin implements FlutterPlugin, ActivityAware {
 
      private Spotifire spotifire;
 
+     private static EventChannel eventChannel;
+
+     private static MethodChannel channel;
+
 
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-    final MethodChannel channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "spotifyclient");
-      final EventChannel eventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(),"musicStream");
+     channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "spotifyclient");
+       eventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(),"musicStream");
       final SpotifyStreamHandler spotifyStreamHandler = new SpotifyStreamHandler(channel);
 
  spotifire = new Spotifire(flutterPluginBinding.getApplicationContext(),spotifyStreamHandler);
@@ -39,8 +43,8 @@ public class SpotifyclientPlugin implements FlutterPlugin, ActivityAware {
   }
 
   public static void registerWith(Registrar registrar) {
-      final MethodChannel channel = new MethodChannel(registrar.messenger(), "spotifyclient");
-      final EventChannel eventChannel = new EventChannel(registrar.messenger(),"musicStream");
+       channel = new MethodChannel(registrar.messenger(), "spotifyclient");
+       eventChannel = new EventChannel(registrar.messenger(),"musicStream");
 
 
       final SpotifyStreamHandler spotifyStreamHandler = new SpotifyStreamHandler(channel);
@@ -62,6 +66,8 @@ public class SpotifyclientPlugin implements FlutterPlugin, ActivityAware {
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
       this.toreActivity();
       spotifire.disconnectRemote();
+      channel.setMethodCallHandler(null);
+      eventChannel.setStreamHandler(null);
   }
 
 
