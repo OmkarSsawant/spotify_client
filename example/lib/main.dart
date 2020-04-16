@@ -23,7 +23,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> initPlatformState() async {
-    await Spotifire.init(clientid: "155e080c3b0d482683a8a088b4a5779e");
+    await Spotifire.init(clientid: "Your client id ");
 
     if (!mounted) return;
 

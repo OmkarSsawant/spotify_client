@@ -5,8 +5,8 @@
 ## 2 step  Configurations
 #### 1 .  Get client id
 
-   Just go to the [spotify developers site](https:/flutter.dev/docs) login and register your application.
-   You just need to follow and prepare your environment from [Quick Start]('https://developer.spotify.com/documentation/android/quick-start/') .
+   Just go to the [spotify developers site](https://developer.spotify.com/dashboard/) login and register your application.
+   You just need to follow and prepare your environment from [quick start]('https://developer.spotify.com/documentation/android/quick-start/') .
 
    ###### How to register
 Set  `redirect uri` as `spotify-sdk://auth` and app name as `your app name`and android section `package name and debug,release fingerprint` in registration.
@@ -53,11 +53,6 @@ you will be provided with `client id`.
  if (await Spotifire.isRemoteConnected) await Spotifire.disconnectRemote;
 
 ```
-### play 
-```dart
-  await Spotifire.playPlaylist(
-                  playlistUri: "spotify:playlist:37i9dQZF1DX3rxVfibe1L0");
-```
 
 You can get `playlistUri` from spotify App.
 
@@ -93,7 +88,7 @@ You can get `playlistUri` from spotify App.
 
 ```dart
 
-   await Spotifire.seekTo(Duration position);
+   await Spotifire.seekTo(Duration position,Duration totalDuration);
    
 ```
 
@@ -124,6 +119,3 @@ You can get `playlistUri` from spotify App.
 
 ```
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
