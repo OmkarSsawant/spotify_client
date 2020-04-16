@@ -1,6 +1,6 @@
 name: spotifyclient
 description: A new Flutter plugin.Spotidy Sdk which handles authorization as well as playing playlist of your choice free.
-version: 0.0.6
+version: 0.0.7
 # author: OmkarSsawant <visiondev257@gmail.com>
 homepage: https://github.com/OmkarSsawant/spotify_client
 

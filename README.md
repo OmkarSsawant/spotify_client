@@ -119,7 +119,7 @@ You can get `playlistUri` from spotify App.
 
 ```
 
-### Demo
+## Demo
 
 
 ![alt](https://raw.githubusercontent.com/OmkarSsawant/Simple_Solutions/master/Assets/sootify.gif)
