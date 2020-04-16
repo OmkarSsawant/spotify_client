@@ -109,8 +109,8 @@ static Future<void> close() async {
   static Future<void> seekTo(
       {@required Duration seekDuration, @required Duration totalDuration}) async {
     if (seekDuration.inMilliseconds <= totalDuration.inMilliseconds) {
-      Map config;
-      config.putIfAbsent(seekDuration, () => seekDuration.inMilliseconds);
+      Map config = new Map();
+      config.putIfAbsent("duration", () => seekDuration.inMilliseconds);
       await _channel.invokeMethod("seekTo", config);
     }
   }

@@ -22,69 +22,68 @@ import io.flutter.plugin.common.MethodChannel;
 public class SpotifyStreamHandler implements EventChannel.StreamHandler, Subscription.EventCallback<PlayerState> {
 
 
-
     private PlayerState mPlayerState;
 
     private Spotifire spotifire;
 
     private EventChannel.EventSink mEventSink;
 
-private  Map<String ,Integer> map = new HashMap<>();
+    private Map<String, Integer> map = new HashMap<>();
 
-    private  MethodChannel methodChannel;
+    private MethodChannel methodChannel;
 
-  private  long prepos=0;
+    private long prepos = 0;
 
-   private int millisecs=0;
-   boolean isrunnablerunning=false;
-    private boolean ispaused=false;
+    private int millisecs = 0;
+    private int tmillisecs = 0;
+    boolean isrunnablerunning = false;
+    private boolean ispaused = false;
     private final Handler handler = new Handler();
 
 
-    SpotifyStreamHandler(MethodChannel channel){
-       this.methodChannel = channel;
+    SpotifyStreamHandler(MethodChannel channel) {
+        this.methodChannel = channel;
     }
 
 
     private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
-         try{
+            try {
 
-             if(spotifire.isConnected() && !ispaused && mPlayerState!=null)
-             {
-                 if(prepos!=mPlayerState.playbackPosition){
-                     //is seeked
-                     map.clear();
-                     millisecs =(int) mPlayerState.playbackPosition;
-                     map.put("d",millisecs);
-                     methodChannel.invokeMethod("music.position",map);
-                 }else{
-                     map.clear();
-                     millisecs+=1000;
-                     map.put("d",millisecs);
-                     methodChannel.invokeMethod("music.position",map);
-                 }
-
-             }
-             if(mPlayerState!=null) prepos = mPlayerState.playbackPosition;
-             handler.postDelayed(this,1000);
-         }catch (Exception e){
-             e.printStackTrace();
-         }
+                if (spotifire.isConnected() && !ispaused && mPlayerState != null) {
+                    if (prepos != mPlayerState.playbackPosition) {
+                        //is seeked
+                        map.clear();
+                        millisecs = (int) mPlayerState.playbackPosition;
+                        map.put("d", millisecs);
+                        methodChannel.invokeMethod("music.position", map);
+                    } else {
+                        map.clear();
+                        if (millisecs < tmillisecs)
+                            millisecs += 1000;
+                        map.put("d", millisecs);
+                        methodChannel.invokeMethod("music.position", map);
+                    }
+                    handler.postDelayed(this, 1000);
+                    prepos = mPlayerState.playbackPosition;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
         }
 
     };
 
-    void startPositionRunnable(){
+    void startPositionRunnable() {
         handler.post(runnable);
         isrunnablerunning = true;
     }
 
-    void stopPositionRunnable(){
+    void stopPositionRunnable() {
         handler.removeCallbacks(runnable);
-        isrunnablerunning= false;
+        isrunnablerunning = false;
     }
 
     void setSpotifire(Spotifire spotifire) {
@@ -127,9 +126,10 @@ private  Map<String ,Integer> map = new HashMap<>();
 
 
         final Track track = playerState.track;
-        mPlayerState =   playerState;
+        mPlayerState = playerState;
         ispaused = playerState.isPaused;
         if (track != null) {
+            tmillisecs = (int) track.duration;
             spotifire.getImage(track.imageUri).setResultCallback(new CallResult.ResultCallback<Bitmap>() {
                 @Override
                 public void onResult(Bitmap bitmap) {

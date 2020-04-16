@@ -12,10 +12,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-
   Music _music;
-
+ int totaldurationinmilli = 0;
   bool ispaused = false;
   @override
   void initState() {
@@ -24,136 +22,185 @@ class _MyAppState extends State<MyApp> {
     initPlatformState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      //TODO: change it
-      await Spotifire.init(clientid: "155e080c3b0d482683a8a088b4a5779e");
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
+    await Spotifire.init(clientid: "155e080c3b0d482683a8a088b4a5779e");
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
 
     Spotifire.musicStream.listen((music) {
       // print("Music" + music.runtimeType.toString());
       if (mounted && music is Music)
         setState(() {
+          totaldurationinmilli = music.duration.inMilliseconds;
+         print(music.duration);
           _music = music;
         });
     }).onError((error) {
       print(error);
     });
 
-
-   Spotifire.positonStream.listen((d)=> print(d.inMilliseconds));
-    // Spotifire.positonStream.listen((Duration position) {
-    //   print(position.inMilliseconds);
-    // });
   }
 
+double val=0.01;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          backgroundColor: Colors.black87,
+          title: const Text('Spotifire'),
         ),
-        body: ListView(
-          padding: const EdgeInsets.all(12),
+        body: Stack(
           children: <Widget>[
-            Column(
+            Container(
+              height: 900,
+              // width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: AlignmentDirectional.topStart,
+                      end: AlignmentDirectional.bottomEnd,
+                      colors: <Color>[
+                    Color.fromRGBO(29, 185, 84, 1.0),
+                    Color.fromRGBO(25, 20, 20, 1.0)
+                  ])),
+            ),
+            ListView(
+              padding: const EdgeInsets.all(12),
               children: <Widget>[
-                if (_music != null)
-                  Material(
-                      elevation: 7.0, child: Image.memory(_music.musicImage)),
-                Text(_music != null ? _music.name : "Loding ... ",style: Theme.of(context).textTheme.display1),
-                Text(_music != null ? _music.album : "Loding ... ",style: Theme.of(context).textTheme.headline.copyWith(
-                  color: Colors.black38
-                ),),
-                Padding(
-                  padding: const EdgeInsets.only(left:228.0),
-                  child: Text(_music != null
-                      ? _music.duration.toString()
-                      : "Loding ... "),
-                ),
-                SizedBox(
-           height: 37,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                Column(
                   children: <Widget>[
-                    IconButton(
-                        icon: Icon(Icons.skip_previous, size: 50),
-                        onPressed: () async {
-                          await Spotifire.skipPrevious;
-                        }),
-                    AnimatedCrossFade(
-                        firstChild: IconButton(
-                            icon: Icon(
-                              Icons.play_arrow,
-                              size: 50,
-                            ),
+                    if (_music != null)
+                      Material(
+                          elevation: 7.0,
+                          child: Image.memory(_music.musicImage)),
+                    Text(_music != null ? _music.name : "Loding ... ",
+                        style: Theme.of(context).textTheme.display1.copyWith(
+                          color:Colors.white.withOpacity(0.95)
+                        )),
+                    Text(
+                      _music != null ? _music.album : "Loding ... ",
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline
+                          .copyWith(color: Colors.white70),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 228.0),
+                      child: Text(_music != null
+                          ? _music.duration.toString()
+                          : "Loding ... ",style: TextStyle(
+                            color:Colors.white54
+                          ),),
+                    ),
+                    SizedBox(
+                      height: 17,
+                    ),
+StreamBuilder<Duration>(
+  stream: Spotifire.positonStream,
+  initialData: Duration.zero,
+  builder: (context, snapshot) {
+   
+           val = snapshot.hasData ?  _getValue(snapshot.data.inMilliseconds) : val;  
+    
+    if(!snapshot.hasData)
+    Slider.adaptive(value: 0.0,onChanged: null,);
+
+    return     Slider.adaptive(value: val, onChanged: (double cv)async{
+
+   final int skd= (totaldurationinmilli * cv).floor() ;
+   final Duration dur = Duration(milliseconds:skd);
+   await   Spotifire.seekTo(seekDuration: dur, totalDuration: Duration(
+        milliseconds: totaldurationinmilli
+      ));
+
+    });
+  }
+),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        IconButton(
+                            icon: Icon(Icons.skip_previous, size: 40,color: Colors.white70,),
                             onPressed: () async {
-                              await Spotifire.resumeMusic.whenComplete((){
-                                setState(() {
-                                  ispaused= false;
-                                });
-                              });
+                              await Spotifire.skipPrevious;
                             }),
-                        secondChild: IconButton(
-                            icon: Icon(Icons.pause, size: 50),
+                        AnimatedCrossFade(
+                            firstChild: IconButton(
+                                icon: Icon(
+                                  Icons.play_arrow
+                                  ,color: Colors.white
+,                                  size: 40,
+                                ),
+                                onPressed: () async {
+                                  await Spotifire.resumeMusic.whenComplete(() {
+                                    setState(() {
+                                      ispaused = false;
+                                    });
+                                  });
+                                }),
+                            secondChild: IconButton(
+                                icon: Icon(Icons.pause, size: 40,color: Colors.white),
+                                onPressed: () async {
+                                  await Spotifire.pauseMusic.whenComplete(() {
+                                    setState(() {
+                                      ispaused = true;
+                                    });
+                                  });
+                                }),
+                            crossFadeState: ispaused
+                                ? CrossFadeState.showFirst
+                                : CrossFadeState.showSecond,
+                            duration: const Duration(milliseconds: 700)),
+                        IconButton(
+                            icon: Icon(Icons.skip_next, size: 40,color: Colors.white70),
                             onPressed: () async {
-                              await Spotifire.pauseMusic.whenComplete((){
-                                setState(() {
-                                  ispaused = true;
-                                });
-                              });
+                              await Spotifire.skipNext;
                             }),
-                        crossFadeState: ispaused
-                            ? CrossFadeState.showFirst
-                            : CrossFadeState.showSecond,
-                        duration: const Duration(milliseconds: 700)),
-                    IconButton(
-                        icon: Icon(Icons.skip_next, size: 50),
-                        onPressed: () async {
-                          await Spotifire.skipNext;
-                        }),
+                      ],
+                    )
                   ],
                 )
               ],
-            )
+            ),
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.playlist_play,size: 35,),
-          onPressed: () async {
+            child: Icon(
+              Icons.playlist_play,
+              size: 35,
+            ),
+            onPressed: () async {
               await Spotifire.getAccessToken.then(print);
 
-          await Spotifire.connectRemote.then(print).whenComplete(()=>print("compl"));
-          try {
-            if (await Spotifire.isRemoteConnected)
-              await Spotifire.playPlaylist(
-                  playlistUri: "spotify:playlist:37i9dQZF1DX3rxVfibe1L0");
-          } catch (e) {
-            print(e);
-          }
-        }),
+              await Spotifire.connectRemote
+                  .then(print)
+                  .whenComplete(() => print("compl"));
+              try {
+                if (await Spotifire.isRemoteConnected)
+                  await Spotifire.playPlaylist(
+                      playlistUri: "spotify:playlist:37i9dQZF1DX3rxVfibe1L0");
+              } catch (e) {
+                print(e);
+              }
+            }),
       ),
     );
   }
 
+double  _getValue(int milliseconds){
+        double percentage = (milliseconds/totaldurationinmilli) *100;
+
+        print(percentage.toString() + " % ");
+
+        double tpo = (percentage / 100) * 1.0;
+    return tpo;
+}
+
   @override
   void dispose() {
-  Spotifire.close();
+    Spotifire.close();
 
     super.dispose();
   }
-
-  
 }
