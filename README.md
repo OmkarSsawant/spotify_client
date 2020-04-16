@@ -6,7 +6,7 @@
 #### 1 .  Get client id
 
    Just go to the [spotify developers site](https://developer.spotify.com/dashboard/) login and register your application.
-   You just need to follow and prepare your environment from [quick start]('https://developer.spotify.com/documentation/android/quick-start/') .
+   You just need to follow and prepare your environment from [quick start](https://developer.spotify.com/documentation/android/quick-start/) .
 
    ###### How to register
 Set  `redirect uri` as `spotify-sdk://auth` and app name as `your app name`and android section `package name and debug,release fingerprint` in registration.
@@ -16,7 +16,7 @@ you will be provided with `client id`.
 
 #### 2. Paste the files
   
-  Just goto  [spotify android sdk site]('https://github.com/spotify/android-sdk/releases/')  and download  `spotify-app-remote-release-0.7.0.aar` and ` spotify-auth-release-1.2.3.aar` and paste it in `project-name/android/`  directory
+  Just goto  [spotify android sdk site](https://github.com/spotify/android-sdk/releases/)  and download  `spotify-app-remote-release-0.7.0.aar` and ` spotify-auth-release-1.2.3.aar` and paste it in `project-name/android/`  directory
 
 
 
@@ -122,4 +122,4 @@ You can get `playlistUri` from spotify App.
 ### Demo
 
 
-![demo app]('https://raw.githubusercontent.com/OmkarSsawant/Simple_Solutions/master/Assets/sootify.gif')
+![alt](https://raw.githubusercontent.com/OmkarSsawant/Simple_Solutions/master/Assets/sootify.gif)
