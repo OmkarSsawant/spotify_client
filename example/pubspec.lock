@@ -135,7 +135,7 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.5.5"
-  spotify_auth_player:
+  spotifyclient:
     dependency: "direct dev"
     description:
       path: ".."
