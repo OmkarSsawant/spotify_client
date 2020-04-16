@@ -23,13 +23,13 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> initPlatformState() async {
-    await Spotifire.init(clientid: "Your client id ");
+    await Spotifire.init(clientid: "155e080c3b0d482683a8a088b4a5779e");
 
     if (!mounted) return;
 
     Spotifire.musicStream.listen((music) {
       // print("Music" + music.runtimeType.toString());
-      if (mounted && music is Music)
+      if (mounted)
         setState(() {
           totaldurationinmilli = music.duration.inMilliseconds;
          print(music.duration);
