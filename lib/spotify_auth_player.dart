@@ -9,15 +9,14 @@ class Spotifire {
   static const MethodChannel _channel = const MethodChannel('spotifyclient');
   static EventChannel _eventChannel = EventChannel('musicStream');
 
-
-
   static Stream _stream;
 
- static final StreamController<Duration> _positonController = new StreamController.broadcast();
- 
- static Stream<Duration> get positonStream => _positonController.stream;
+  static final StreamController<Duration> _positonController =
+      new StreamController.broadcast();
 
- static Sink<Duration> get _$position => _positonController.sink;
+  static Stream<Duration> get positonStream => _positonController.stream;
+
+  static Sink<Duration> get _$position => _positonController.sink;
 
 //Will not work for network issues
 // @deprecated
@@ -29,38 +28,36 @@ class Spotifire {
 //        });
 //  }
 
- 
   int seconds = 0;
 
-
- static void  _startPositionStream(){
-       _channel.setMethodCallHandler((MethodCall call){
-         if(call.method == "music.position"){
-           final Duration duration = new Duration(milliseconds: call.arguments['d']);
-           _$position.add(duration);
-          return;
-         }
-         return;
-       });
- }
-
-
-
-@required
-static Future<void> close() async {
-    if (await Spotifire.isRemoteConnected) await Spotifire._disconnectRemote;
-   closePositionStream;
+  static void _startPositionStream() {
+    _channel.setMethodCallHandler((MethodCall call) {
+      if (call.method == "music.position") {
+        final Duration duration =
+            new Duration(milliseconds: call.arguments['d']);
+        _$position.add(duration);
+        return;
+      }
+      return;
+    });
   }
-  static void get closePositionStream =>(!_positonController.isClosed)? _positonController?.close() : null;
+
+  @required
+  static Future<void> close() async {
+    if (await Spotifire.isRemoteConnected) await Spotifire._disconnectRemote;
+    closePositionStream;
+  }
+
+  static void get closePositionStream =>
+      (!_positonController.isClosed) ? _positonController?.close() : null;
 
   static Stream get musicStream {
     _stream ??= _eventChannel.receiveBroadcastStream();
     return _stream.map<Music>((music) => Music.fromNativeMusic(music));
   }
 
-
   static Future<void> init({@required String clientid}) async {
-    Map configs= new Map();    
+    Map configs = new Map();
     configs.putIfAbsent("client_id", () => clientid);
     await _channel.invokeMethod('loginSpotify', configs);
   }
@@ -86,10 +83,10 @@ static Future<void> close() async {
   }
 
   static Future<void> playPlaylist({@required String playlistUri}) async {
-    Map config=new Map();
+    Map config = new Map();
     config.putIfAbsent("playListUri", () => playlistUri);
-    await _channel.invokeMethod('playPlaylist', config).whenComplete((){
-     _startPositionStream();
+    await _channel.invokeMethod('playPlaylist', config).whenComplete(() {
+      _startPositionStream();
     });
   }
 
@@ -107,7 +104,8 @@ static Future<void> close() async {
   static Future<String> get test async => await _channel.invokeMethod('test');
 
   static Future<void> seekTo(
-      {@required Duration seekDuration, @required Duration totalDuration}) async {
+      {@required Duration seekDuration,
+      @required Duration totalDuration}) async {
     if (seekDuration.inMilliseconds <= totalDuration.inMilliseconds) {
       Map config = new Map();
       config.putIfAbsent("duration", () => seekDuration.inMilliseconds);
@@ -125,14 +123,14 @@ static Future<void> close() async {
       _repeat = 0;
     }
 
-    Map config=new Map();
+    Map config = new Map();
     config.putIfAbsent("repeat", () => _repeat);
 
     await _channel.invokeMethod("setRepeat", config);
   }
 
   static Future<void> queue({@required String playlistUri}) async {
-    Map config=new Map();
+    Map config = new Map();
     config.putIfAbsent("nqueue", () => playlistUri);
   }
 }
