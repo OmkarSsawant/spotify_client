@@ -16,7 +16,7 @@ you will be provided with `client id`.
 
 #### 2. Paste the files
   
-  Just goto [this site]('https://github.com/spotify/android-sdk/releases') and download  `spotify-app-remote-release-0.7.0.aar` and ` spotify-auth-release-1.2.3.aar` and paste it in `project-name/android/`  directory
+  Just goto [spotify android sdk site]('https://github.com/spotify/android-sdk/releases') and download  `spotify-app-remote-release-0.7.0.aar` and ` spotify-auth-release-1.2.3.aar` and paste it in `project-name/android/`  directory
 
 
 
@@ -122,4 +122,4 @@ You can get `playlistUri` from spotify App.
 ### Demo
 
 
-[demo]('https://raw.githubusercontent.com/OmkarSsawant/Simple_Solutions/master/Assets/sootify.gif')
+[demo app]('https://raw.githubusercontent.com/OmkarSsawant/Simple_Solutions/master/Assets/sootify.gif')
