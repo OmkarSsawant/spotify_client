@@ -9,13 +9,11 @@ void main() => runApp(MyApp());
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
-
-  
 }
 
 class _MyAppState extends State<MyApp> {
   Music _music;
- int totaldurationinmilli = 0;
+  int totaldurationinmilli = 0;
   bool ispaused = false;
   @override
   void initState() {
@@ -34,16 +32,15 @@ class _MyAppState extends State<MyApp> {
       if (mounted)
         setState(() {
           totaldurationinmilli = music.duration.inMilliseconds;
-         print(music.duration);
+          print(music.duration);
           _music = music;
         });
     }).onError((error) {
       print(error);
     });
-
   }
 
-double val=0.01;
+  double val = 0.01;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -76,9 +73,10 @@ double val=0.01;
                           elevation: 7.0,
                           child: Image.memory(_music.musicImage)),
                     Text(_music != null ? _music.name : "Loding ... ",
-                        style: Theme.of(context).textTheme.display1.copyWith(
-                          color:Colors.white.withOpacity(0.95)
-                        )),
+                        style: Theme.of(context)
+                            .textTheme
+                            .display1
+                            .copyWith(color: Colors.white.withOpacity(0.95))),
                     Text(
                       _music != null ? _music.album : "Loding ... ",
                       style: Theme.of(context)
@@ -88,51 +86,61 @@ double val=0.01;
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 228.0),
-                      child: Text(_music != null
-                          ? _music.duration.toString()
-                          : "Loding ... ",style: TextStyle(
-                            color:Colors.white54
-                          ),),
+                      child: Text(
+                        _music != null
+                            ? _music.duration.toString()
+                            : "Loding ... ",
+                        style: TextStyle(color: Colors.white54),
+                      ),
                     ),
                     SizedBox(
                       height: 17,
                     ),
-StreamBuilder<Duration>(
-  stream: Spotifire.positonStream,
-  initialData: Duration.zero,
-  builder: (context, snapshot) {
-   
-           val = snapshot.hasData ?  _getValue(snapshot.data.inMilliseconds) : val;  
-    
-    if(!snapshot.hasData)
-    Slider.adaptive(value: 0.0,onChanged: null,);
+                    StreamBuilder<Duration>(
+                        stream: Spotifire.positonStream,
+                        // initialData: Duration.zero,
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData)
+                           return Slider.adaptive(
+                              value: 0.0,
+                              onChanged: (d) {},
+                            );
+                            print(snapshot.hasData);
+                          val = snapshot.hasData
+                              ? _getValue(snapshot.data.inMilliseconds)
+                              : val;
 
-    return     Slider.adaptive(value: val, onChanged: (double cv)async{
-
-   final int skd= (totaldurationinmilli * cv).floor() ;
-   final Duration dur = Duration(milliseconds:skd);
-   await   Spotifire.seekTo(seekDuration: dur, totalDuration: Duration(
-        milliseconds: totaldurationinmilli
-      ));
-
-    });
-  }
-),
-
+                          return Slider.adaptive(
+                            value: val,
+                            onChanged: (double cv) async {
+                              final int skd =
+                                  (totaldurationinmilli * cv).floor();
+                              final Duration dur = Duration(milliseconds: skd);
+                              await Spotifire.seekTo(
+                                  seekDuration: dur,
+                                  totalDuration: Duration(
+                                      milliseconds: totaldurationinmilli));
+                            },
+                          );
+                        }),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         IconButton(
-                            icon: Icon(Icons.skip_previous, size: 40,color: Colors.white70,),
+                            icon: Icon(
+                              Icons.skip_previous,
+                              size: 40,
+                              color: Colors.white70,
+                            ),
                             onPressed: () async {
                               await Spotifire.skipPrevious;
                             }),
                         AnimatedCrossFade(
                             firstChild: IconButton(
                                 icon: Icon(
-                                  Icons.play_arrow
-                                  ,color: Colors.white
-,                                  size: 40,
+                                  Icons.play_arrow,
+                                  color: Colors.white,
+                                  size: 40,
                                 ),
                                 onPressed: () async {
                                   await Spotifire.resumeMusic.whenComplete(() {
@@ -142,7 +150,8 @@ StreamBuilder<Duration>(
                                   });
                                 }),
                             secondChild: IconButton(
-                                icon: Icon(Icons.pause, size: 40,color: Colors.white),
+                                icon: Icon(Icons.pause,
+                                    size: 40, color: Colors.white),
                                 onPressed: () async {
                                   await Spotifire.pauseMusic.whenComplete(() {
                                     setState(() {
@@ -155,7 +164,8 @@ StreamBuilder<Duration>(
                                 : CrossFadeState.showSecond,
                             duration: const Duration(milliseconds: 700)),
                         IconButton(
-                            icon: Icon(Icons.skip_next, size: 40,color: Colors.white70),
+                            icon: Icon(Icons.skip_next,
+                                size: 40, color: Colors.white70),
                             onPressed: () async {
                               await Spotifire.skipNext;
                             }),
@@ -190,14 +200,14 @@ StreamBuilder<Duration>(
     );
   }
 
-double  _getValue(int milliseconds){
-        double percentage = (milliseconds/totaldurationinmilli) *100;
+  double _getValue(int milliseconds) {
+    double percentage = (milliseconds / totaldurationinmilli) * 100;
 
-        print(percentage.toString() + " % ");
+    print(percentage.toString() + " % ");
 
-        double tpo = (percentage / 100) * 1.0;
+    double tpo = (percentage / 100) * 1.0;
     return tpo;
-}
+  }
 
   @override
   void dispose() {

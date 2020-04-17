@@ -1,2 +1,3 @@
-rootProject.name = 'spotifyclient'
+rootProject.name = 'spotify_auth_player'
 
+include ':spotify-auth', ':spotify-app-remote'
