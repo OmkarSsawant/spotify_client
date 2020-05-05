@@ -31,6 +31,7 @@ import java.util.Map;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 
+
 import static com.spotify.sdk.android.auth.AuthorizationResponse.Type.ERROR;
 import static com.spotify.sdk.android.auth.AuthorizationResponse.Type.TOKEN;
 

@@ -133,6 +133,13 @@ class Spotifire {
     Map config = new Map();
     config.putIfAbsent("nqueue", () => playlistUri);
   }
+
+  static String getSpotifyUri(String url) {
+    final String suburl = url.substring(25);
+    int qindex = suburl.indexOf("?");
+    String filteredurl = suburl.substring(0, qindex);
+    return "spotify:" + filteredurl.replaceFirst("/", ":");
+  }
 }
 
 class Music {

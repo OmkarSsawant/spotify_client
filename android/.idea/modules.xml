@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/android.iml" filepath="$PROJECT_DIR$/.idea/android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spotify-app-remote/spotify-app-remote.iml" filepath="$PROJECT_DIR$/spotify-app-remote/spotify-app-remote.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spotify-auth/spotify-auth.iml" filepath="$PROJECT_DIR$/spotify-auth/spotify-auth.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spotify_auth_player.iml" filepath="$PROJECT_DIR$/spotify_auth_player.iml" />
     </modules>
   </component>
 </project>
