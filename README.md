@@ -24,16 +24,17 @@ you will be provided with `client id`.
 
 #### 2. Import them as module
 
-  Just goto [this site](https://github.com/spotify/android-sdk/releases) and download  `spotify-app-remote-release-0.7.0.aar` and ` spotify-auth-release-1.2.3.aar` and import them as module in your android app
+  1 . Download this 2 folder [spotify_auth]('https://drive.google.com/drive/folders/1MBYVsxQbLkwri7NLvfhevD2Oza7IUHZY?usp=sharing') and [spotify_app_remote]('https://drive.google.com/drive/folders/1wOpWfG_HnfTa8eGmUYv0son5QybZZNS3?usp=sharing')
+  and just move them in your `<project-name>/android` folder 
 
-  ![step1](https://developer.spotify.com/assets/new-module.png)
+  2 . Now in your `settings.gradle` make sure you add
 
-  ![step2](https://developer.spotify.com/assets/import-jar.png)
+   ```gradle
+      include 'spotify_auth'
+      inlcude 'spotify_app_remote'
+  ```   
 
-  ![step3](https://developer.spotify.com/assets/create-new-module.png)
-
-
-
+  Done ! , You are ready to create Awesome apps
 
 ## Initialize Spotifire
 
