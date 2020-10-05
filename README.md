@@ -24,7 +24,8 @@ you will be provided with `client id`.
 
 #### 2. Import them as module
 
-  1 . Download this 2 folder [spotify_auth]('https://drive.google.com/drive/folders/1MBYVsxQbLkwri7NLvfhevD2Oza7IUHZY?usp=sharing') and [spotify_app_remote]('https://drive.google.com/drive/folders/1wOpWfG_HnfTa8eGmUYv0son5QybZZNS3?usp=sharing')
+  1 . Download this 2 folder [spotify_auth](https://drive.google.com/drive/folders/1MBYVsxQbLkwri7NLvfhevD2Oza7IUHZY?usp=sharing) and [spotify_app_remote](https://drive.google.com/drive/folders/1wOpWfG_HnfTa8eGmUYv0son5QybZZNS3?usp=sharing)
+  ###### after click on above folder-name(links) new page opens click > ' Download All ' and unzip them as spotify-auth and spotify-app-remote respectively.  
   and just move them in your `<project-name>/android` folder 
 
   2 . Now in your `settings.gradle` make sure you add
